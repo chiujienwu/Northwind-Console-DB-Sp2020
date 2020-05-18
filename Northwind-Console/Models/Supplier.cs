@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace NorthwindConsole.Models
 {
     public class Supplier
     {
         public int SupplierId { get; set; }
+        [Required(ErrorMessage = "Company Name is Required")]
+        [MaxLength(40)]
         public string CompanyName { get; set; }
         public string ContactName { get; set; }
         public string ContactTitle { get; set; }
