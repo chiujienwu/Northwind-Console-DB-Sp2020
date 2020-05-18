@@ -18,10 +18,18 @@ namespace NorthwindConsole
                 string choice;
                 do
                 {
-                    Console.WriteLine("1) Display Categories");
+                    Console.WriteLine("1) Display Categories and Descriptions");
                     Console.WriteLine("2) Add Category");
-                    Console.WriteLine("3) Display Category and related products");
-                    Console.WriteLine("4) Display all Categories and their related products");
+                    // can give submenu options for menu choices 3 and 4 in order to preserve the previous features
+                    Console.WriteLine("3) (Modify) Display Category and related active products");
+                    Console.WriteLine("4) (Modify - Done) Display all Categories and their related active products");
+                    Console.WriteLine("5) (New) Add new Product record");
+                    Console.WriteLine("6) (New) Edit existing Product record");
+                    Console.WriteLine("7) (New) Display specific Product details");
+                    Console.WriteLine("8) (New) Edit a Category");
+                    Console.WriteLine("9) (New) Delete a Product record");
+                    Console.WriteLine("0) (New) Delete a Category record");
+                    // use data annotations and handle all user errors gracefully and Nlog errors
                     Console.WriteLine("\"q\" to quit");
                     choice = Console.ReadLine();
                     Console.Clear();
@@ -87,25 +95,114 @@ namespace NorthwindConsole
                         int id = int.Parse(Console.ReadLine());
                         Console.Clear();
                         logger.Info($"CategoryId {id} selected");
+
                         Category category = db.Categories.FirstOrDefault(c => c.CategoryId == id);
                         Console.WriteLine($"{category.CategoryName} - {category.Description}");
-                        foreach(Product p in category.Products)
+                        
+                        // give user option to select all products, active only products or discontinued products.
+
+                        Console.WriteLine("Please select the following options: ");
+                        Console.WriteLine("P) for All Products");
+                        Console.WriteLine("A) for Active only Products");
+                        Console.WriteLine("D) for Discontinued Products");
+                        var entry = Console.ReadLine().ToUpper();
+                        logger.Info("User selected option " + entry);
+
+                        try
                         {
-                            Console.WriteLine(p.ProductName);
+                            if (entry == "P")
+                            {
+                                foreach (Product p in category.Products)
+                                {
+                                    Console.WriteLine(p.ProductName);
+                                }
+                            } else if (entry == "A")
+                            {
+                                foreach (Product p in category.Products.Where(p => p.Discontinued.Equals(false)))
+                                {
+                                    Console.WriteLine(p.ProductName);
+                                }
+                            } else if (entry == "D")
+                            {
+                                foreach (Product p in category.Products.Where(p => p.Discontinued.Equals(true)))
+                                {
+                                    Console.WriteLine(p.ProductName);
+                                }
+                            }
+                            else
+                            {
+                                logger.Info(entry + "is not a valid selection.");
+                            }
                         }
+                        catch (Exception e)
+                        {
+                            logger.Info("Unable to retrieve product information." + e);
+                        }
+
+                        
                     }
                     else if (choice == "4")
                     {
                         var db = new NorthwindContext();
                         var query = db.Categories.Include("Products").OrderBy(p => p.CategoryId);
-                        foreach(var item in query)
+
+                        // give user option to select all products, active only products or discontinued products.
+
+                        Console.WriteLine("Please select the following options: ");
+                        Console.WriteLine("P) for All Products");
+                        Console.WriteLine("A) for Active only Products");
+                        Console.WriteLine("D) for Discontinued Products");
+                        var entry = Console.ReadLine().ToUpper();
+                        logger.Info("User selected option " + entry);
+                        var flag = false;
+
+                        try
                         {
-                            Console.WriteLine($"{item.CategoryName}");
-                            foreach(Product p in item.Products)
+                            if (entry == "A")
                             {
-                                Console.WriteLine($"\t{p.ProductName}");
+                                flag = false;
+
+                            } else if (entry == "D")
+                            {
+                                flag = true;
+                            }
+
+                            if (entry == "D" || entry == "A")
+                            {
+
+                                foreach (var item in query)
+                                {
+                                    Console.WriteLine($"{item.CategoryName} - Active Products");
+
+                                    foreach (Product p in item.Products.Where(p => p.Discontinued.Equals(flag)))
+                                    {
+                                        Console.WriteLine($"\t{p.ProductName}");
+                                    }
+                                }
+                            }
+                            else if (entry == "P")
+                            {
+                                foreach (var item in query)
+                                {
+                                    Console.WriteLine($"{item.CategoryName} - Active Products");
+
+                                    foreach (Product p in item.Products)
+                                    {
+                                        Console.WriteLine($"\t{p.ProductName}");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                logger.Info("Invalid selection: " + entry);
                             }
                         }
+                        catch (Exception e)
+                        {
+                            logger.Info("Unable to retrieve product details: " + e);
+                        }
+
+                        
                     }
                     Console.WriteLine();
 
