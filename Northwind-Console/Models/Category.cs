@@ -5,7 +5,7 @@ namespace NorthwindConsole.Models
 {
     public class Category
     {
-        public int CategoryId { get; set; }
+        public int CategoryID { get; set; }
         [Required(ErrorMessage = "Category Name is Required")]
         [MaxLength(15)]
         public string CategoryName { get; set; }

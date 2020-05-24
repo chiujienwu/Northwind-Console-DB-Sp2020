@@ -5,7 +5,7 @@ namespace NorthwindConsole.Models
 {
     public class Supplier
     {
-        public int SupplierId { get; set; }
+        public int SupplierID { get; set; }
         [Required(ErrorMessage = "Company Name is Required")]
         [MaxLength(40)]
         public string CompanyName { get; set; }
