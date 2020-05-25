@@ -19,6 +19,8 @@ namespace NorthwindConsole
                 string choice;
                 do
                 {
+                    Console.WriteLine("Main Menu");
+                    Console.WriteLine("=========");
                     Console.WriteLine("1) Display Categories and Descriptions");
                     Console.WriteLine("2) Add Category");
                     // can give submenu options for menu choices 3 and 4 in order to preserve the previous features
@@ -26,7 +28,7 @@ namespace NorthwindConsole
                     Console.WriteLine("4) (Modify - Done) Display all Categories and their related active products");
                     Console.WriteLine("5) (New - Done) Add new Product record");
                     Console.WriteLine("6) (New - Done) Edit existing Product record");
-                    Console.WriteLine("7) (New) Display specific Product details");
+                    Console.WriteLine("7) (New - Done) Display specific Product details");
                     Console.WriteLine("8) (New) Edit a Category");
                     Console.WriteLine("9) (New) Delete a Product record");
                     Console.WriteLine("0) (New) Delete a Category record");
@@ -597,7 +599,44 @@ namespace NorthwindConsole
                         }
 
                     }
-                    
+
+                    else if (choice == "7")
+                    {
+                        int value = 0;
+                        var db = new NorthwindContext();
+                        var query = db.Categories.OrderBy(p => p.CategoryID);
+                        Console.WriteLine("Enter the Category ID for the Product Detail to be displayed:");
+
+                        foreach (var item in query)
+                        {
+                            Console.WriteLine($"{item.CategoryID}) {item.CategoryName}");
+                        }
+
+                        bool valid = int.TryParse(Console.ReadLine(), out value);
+                        bool existing = db.Categories.Any(c => c.CategoryID == value);
+
+                        if (valid && existing)
+                        {
+                            var productQuery = db.Products.Where(p => p.CategoryID == value).OrderBy(p => p.ProductID);
+                            foreach (var item in productQuery)
+                            {
+                                Console.WriteLine($"{item.ProductID}) {item.ProductName}");
+                            }
+
+                            int valueProdID = 0;
+                            Console.WriteLine("Enter the Product ID to display details:");
+                            bool validProdID = int.TryParse(Console.ReadLine(), out valueProdID);
+                            bool existingProdID = db.Products.Any(p => p.ProductID == valueProdID);
+
+                            if (validProdID && existingProdID)
+                            {
+                                DisplayProduct(db.Products.First(p => p.ProductID == valueProdID), db);
+                            }
+                        }
+                    }
+
+
+
                     Console.WriteLine();
 
                 } while (choice.ToLower() != "q");
