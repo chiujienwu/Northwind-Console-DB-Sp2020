@@ -267,7 +267,7 @@ namespace NorthwindConsole
                                     }
                                     else
                                     {
-                                        Console.WriteLine("Category ID must be a number value listed.");
+                                        logger.Info("Category ID must be a number value listed.");
                                     }
 
                                 }
@@ -296,7 +296,7 @@ namespace NorthwindConsole
                                     }
                                     else
                                     {
-                                        Console.WriteLine("Supplier ID must be a number value listed");
+                                        logger.Info("Supplier ID must be a number value listed.");
                                     }
 
                                 }
@@ -589,13 +589,13 @@ namespace NorthwindConsole
                             }
                             else
                             {
-                                Console.WriteLine("Invalid Category ID.");
+                                logger.Info("Enter correct Category ID value");
                             }
 
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e);
+                            logger.Info("Error : " + e);
                         }
 
                     }
@@ -632,10 +632,145 @@ namespace NorthwindConsole
                             {
                                 DisplayProduct(db.Products.First(p => p.ProductID == valueProdID), db);
                             }
+                            else
+                            {
+                                logger.Info("Enter correct Product ID value");
+                            }
+
+                        }
+                        else
+                        {
+                            logger.Info("Enter correct Category ID value");
+                        }
+
+                    }
+
+                    else if (choice == "8")
+                    {
+                        int value = 0;
+                        var db = new NorthwindContext();
+                        var query = db.Categories.OrderBy(p => p.CategoryID);
+                        
+                        foreach (var item in query)
+                        {
+                            Console.WriteLine($"{item.CategoryID}) {item.CategoryName}");
+                        }
+                        
+                        Console.WriteLine("Enter the Category ID to edit:");
+                        bool valid = int.TryParse(Console.ReadLine(), out value);
+                        bool existing = db.Categories.Any(c => c.CategoryID == value);
+
+                        if (valid && existing)
+                        {
+                            var cat = db.Categories.First(c => c.CategoryID == value);
+                            Console.WriteLine($"2) Category {cat.CategoryID} {cat.CategoryName}");
+
+                            Console.WriteLine("Enter new Category name");
+
+                            cat.CategoryName = Console.ReadLine();
+
+                            db.Entry(cat).State = EntityState.Modified;
+                            db.SaveChanges();
+                        }
+                        else
+                        {
+                            logger.Info("Enter correct Category ID value");
+                        }
+
+                    }
+
+                    else if (choice == "9")
+                    {
+                        var db = new NorthwindContext();
+                        var query = db.Categories.OrderBy(p => p.CategoryID);
+
+                        foreach (var item in query)
+                        {
+                            Console.WriteLine($"{item.CategoryID}) {item.CategoryName}");
+                        }
+
+                        int value = 0;
+                        Console.WriteLine("Enter the Category ID the Product belongs to :");
+                        bool valid = int.TryParse(Console.ReadLine(), out value);
+                        bool existing = db.Categories.Any(c => c.CategoryID == value);
+
+                        if (valid && existing)
+                        {
+                            var productQuery = db.Products.Where(p => p.CategoryID == value).OrderBy(p => p.ProductID);
+                            foreach (var item in productQuery)
+                            {
+                                Console.WriteLine($"{item.ProductID}) {item.ProductName}");
+                            }
+
+                            int valueProdID = 0;
+                            Console.WriteLine("Enter the Product ID to edit:");
+                            bool validProdID = int.TryParse(Console.ReadLine(), out valueProdID);
+                            bool existingProdID = db.Products.Any(p => p.ProductID == valueProdID);
+
+                            if (validProdID && existingProdID)
+                            {
+                                var deleteProduct = db.Products.First(p => p.ProductID == valueProdID);
+                                Console.WriteLine($"Are you sure you wish to delete : {deleteProduct.ProductName} ?");
+                                var confirm = Console.ReadLine().ToUpper();
+
+                                if (confirm == "Y" || confirm == "YES")
+                                {
+                                    db.Products.Remove(deleteProduct);
+                                    db.SaveChanges();
+                                }
+                            }
+                            else
+                            {
+                                logger.Info("Enter valid Product ID value");
+                            }
+                        }
+                        else
+                        {
+                            logger.Info("Enter correct Category ID value");
                         }
                     }
 
+                    else if (choice == "0")
+                    {
+                        var db = new NorthwindContext();
+                        var query = db.Categories.OrderBy(p => p.CategoryID);
 
+                        foreach (var item in query)
+                        {
+                            Console.WriteLine($"{item.CategoryID}) {item.CategoryName}");
+                        }
+
+                        int value = 0;
+                        Console.WriteLine("Warning:  Deleting a Category will also delete all Products within the Category");
+                        Console.WriteLine("Enter the Category ID to be deleted along with its products :");
+                        bool valid = int.TryParse(Console.ReadLine(), out value);
+                        bool existing = db.Categories.Any(c => c.CategoryID == value);
+
+                        if (valid && existing)
+                        {
+                            var removeCategory = db.Categories.First(c => c.CategoryID == value);
+                            var removeProduct = db.Products.Where(p => p.CategoryID == value).OrderBy(p => p.ProductID);
+                            foreach (var item in removeProduct)
+                            {
+                                Console.WriteLine($"{item.ProductID}) {item.ProductName}");
+                            }
+
+                            Console.WriteLine($"Warning: Are you sure you wish to delete the category and all the products to : {removeCategory.CategoryName}");
+                            var confirm = Console.ReadLine().ToUpper();
+
+                            if (confirm == "Y" || confirm == "YES")
+                            {
+
+                                db.Categories.Remove(removeCategory);
+                                db.Products.RemoveRange(removeProduct);
+                                db.SaveChanges();
+                            }
+                        }
+                        else
+                        {
+                            logger.Info("Enter correct Category ID value");
+                        }
+                    }
 
                     Console.WriteLine();
 
