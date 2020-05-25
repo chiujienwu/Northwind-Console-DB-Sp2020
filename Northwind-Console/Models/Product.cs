@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace NorthwindConsole.Models
 {
@@ -24,5 +25,8 @@ namespace NorthwindConsole.Models
 
         public virtual Category Category { get; set; }
         public virtual Supplier Supplier { get; set; }
+
     }
 }
+
+
