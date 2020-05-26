@@ -24,11 +24,11 @@ namespace NorthwindConsole
                     Console.WriteLine("1) Display Categories and Descriptions");
                     Console.WriteLine("2) Add Category");
                     // can give submenu options for menu choices 3 and 4 in order to preserve the previous features
-                    Console.WriteLine("3) (Modify - Done) Display Category and related active products");
-                    Console.WriteLine("4) (Modify - Done) Display all Categories and their related active products");
-                    Console.WriteLine("5) (New - Done) Add new Product record");
-                    Console.WriteLine("6) (New - Done) Edit existing Product record");
-                    Console.WriteLine("7) (New - Done) Display specific Product details");
+                    Console.WriteLine("3) (Modify)Display Category and related active products");
+                    Console.WriteLine("4) (Modify) Display all Categories and their related active products");
+                    Console.WriteLine("5) (New) Add new Product record");
+                    Console.WriteLine("6) (New) Edit existing Product record");
+                    Console.WriteLine("7) (New) Display specific Product details");
                     Console.WriteLine("8) (New) Edit a Category");
                     Console.WriteLine("9) (New) Delete a Product record");
                     Console.WriteLine("0) (New) Delete a Category record");
