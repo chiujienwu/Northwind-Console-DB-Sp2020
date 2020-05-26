@@ -647,34 +647,48 @@ namespace NorthwindConsole
 
                     else if (choice == "8")
                     {
-                        int value = 0;
+                        
                         var db = new NorthwindContext();
                         var query = db.Categories.OrderBy(p => p.CategoryID);
-                        
+
                         foreach (var item in query)
                         {
                             Console.WriteLine($"{item.CategoryID}) {item.CategoryName}");
                         }
+
+                        int value = 0;
                         
-                        Console.WriteLine("Enter the Category ID to edit:");
+                        Console.WriteLine("Enter the Category ID");
                         bool valid = int.TryParse(Console.ReadLine(), out value);
                         bool existing = db.Categories.Any(c => c.CategoryID == value);
 
+
                         if (valid && existing)
                         {
-                            var cat = db.Categories.First(c => c.CategoryID == value);
-                            Console.WriteLine($"2) Category {cat.CategoryID} {cat.CategoryName}");
+                            var category = db.Categories.First(c => c.CategoryID == value);
+                            Console.WriteLine($"2) Category {category.CategoryID} {category.CategoryName}");
 
-                            Console.WriteLine("Enter new Category name");
+                            Console.WriteLine("Enter the new Category name");
+                            category.CategoryName = Console.ReadLine();
 
-                            cat.CategoryName = Console.ReadLine();
+                            ValidationContext context = new ValidationContext(category, null, null);
+                            List<ValidationResult> results = new List<ValidationResult>();
 
-                            db.Entry(cat).State = EntityState.Modified;
-                            db.SaveChanges();
-                        }
-                        else
-                        {
-                            logger.Info("Enter correct Category ID value");
+                            var isValid = Validator.TryValidateObject(category, context, results, true);
+
+                            if (isValid)
+                            {
+                                db.Entry(category).State = EntityState.Modified;
+                                db.SaveChanges();
+                            }
+
+                            if (!isValid)
+                            {
+                                foreach (var result in results)
+                                {
+                                    logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+                                }
+                            }
                         }
 
                     }
